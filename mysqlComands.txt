@@ -1,0 +1,81 @@
+create database products;
+use products;
+
+create table client(
+  idClient int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name varchar(30) NOT NULL,
+  lastName varchar(30) NOT NULL
+);
+
+INSERT INTO client(idClient, name, lastName)
+VALUES (1, `teste`. `teste1`)
+
+create table product(
+  idProduct int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  description varchar(45) NOT NULL
+);
+
+create table request(
+  idRequest int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  date Date NOT NULL,
+  idClient int
+);
+
+ALTER TABLE request
+ADD CONSTRAINT idClient 
+FOREIGN KEY (idClient) REFERENCES client(idClient);
+
+CREATE TABLE request_item(
+  idRequest int,
+  idProduct int,
+  amount int
+);
+
+ALTER TABLE request_item
+ADD CONSTRAINT idRequest
+FOREIGN KEY (idRequest) REFERENCES request(idRequest);
+
+ALTER TABLE request_item
+ADD CONSTRAINT idProduct
+FOREIGN KEY (idProduct) REFERENCES product(idProduct);
+
+********************************************************************************************************
+
+create table client_test(
+  idClient int NOT NULL PRIMARY KEY,
+  name varchar(30) NOT NULL,
+  lastName varchar(30) NOT NULL
+);
+
+INSERT INTO client_test(idClient, name, lastName)
+VALUES (1, `teste`. `teste1`);
+
+create table product_test(
+  idProduct int NOT NULL PRIMARY KEY,
+  description varchar(45) NOT NULL
+);
+
+create table request_test(
+  idRequest int NOT NULL PRIMARY KEY,
+  date Date NOT NULL,
+  idClient int
+);
+
+ALTER TABLE request_test
+ADD FOREIGN KEY (idClient) REFERENCES client_test(idClient);
+
+ALTER TABLE request_test
+ADD CONSTRAINT idClient 
+FOREIGN KEY (idClient) REFERENCES client_test(idClient);
+
+CREATE TABLE request_item_test(
+  idRequest int,
+  idProduct int,
+  amount int
+);
+
+ALTER TABLE request_item_test
+ADD FOREIGN KEY (idRequest) REFERENCES request_test(idRequest);
+
+ALTER TABLE request_item_test
+ADD FOREIGN KEY (idProduct) REFERENCES product_test(idProduct);

@@ -1,0 +1,23 @@
+{
+  "name": "products",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Alisson Ferro <92187207+AlissonFerro@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --testEnvironment=node --watchAll --verbose --coverage",
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "body-parser": "1.20.0",
+    "dotenv": "^16.0.3",
+    "express": "4.16.1",
+    "handlebars": "4.5.0",
+    "mysql2": "^2.3.3",
+    "supertest": "6.2.4"
+  },
+  "devDependencies": {
+    "jest": "22.2.2",
+    "nodemon": "2.0.19"
+  }
+}
