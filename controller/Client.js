@@ -14,7 +14,6 @@ class ClientController {
     const { id } = req.params;
 
     try {
-
       const connection = await connect();
       const [rows] = await connection.query(`SELECT * FROM ${table} where idClient=${id};`);
 
@@ -73,6 +72,24 @@ class ClientController {
       return res.status(200).send(newInfos);
     } catch (error) {
       return res.status(400).send(error);      
+    }
+  }
+
+  static async removeClient(req, res){
+    const table = getTableName();
+    const { id } = req.params;
+
+    try {
+      const connection = await connect();
+      const [client] = await connection.query(`SELECT * FROM ${table} where idClient=${id};`);
+
+      if(client.length < 1){
+        return res.status(404).send(client);
+      }
+
+      return res.status(200).send({sucess: 'sucess'});
+    } catch (error) {
+      return res.status(400).send();
     }
   }
   

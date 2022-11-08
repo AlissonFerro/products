@@ -166,5 +166,36 @@ describe('/api/clientes', async () => {
       expect(res.body[0]).toHaveProperty('name', 'alterName');
       expect(res.body[0]).toHaveProperty('lastName', 'Alter Last Name');        
     });
+  });
+
+  describe('DELETE /:id', () => {
+    beforeEach(async () => {
+      await connection.execute(
+        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1');"
+      );
+    });
+    
+    afterEach(async () => {
+      await connection.execute('delete from `client_test` where idClient = 1;');
+    });
+    
+    it('should return 400 if id is not valid', async () => {
+      const invalidsId = ['a', '!', '1a', NaN];
+      invalidsId.map(async (invalidId) => {
+        const res = await request(server).delete(`/api/clientes/${invalidId}`).send();
+        expect(res.status).toBe(400);
+      })
+    });
+
+    it('should return 404 if id was not found', async () => {
+      const res = await request(server).delete('/api/clientes/3').send();
+      expect(res.status).toBe(404);
+    });
+
+    it('should delete item if id is valid', async () => {
+      const res = await request(server).delete('/api/clientes/1').send();
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('sucess', 'sucess');
+    });
   })
 })
