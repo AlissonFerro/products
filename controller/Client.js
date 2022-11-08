@@ -49,6 +49,33 @@ class ClientController {
 
     return res.status(200).send(client);
   }
+
+  static async alterClientById(req, res){
+    const { id } = req.params;
+    const { name, lastName } = req.body;
+    if(!name || !lastName || name.length < 3 || lastName.length < 3)
+      return res.status(400).send();
+
+    const table = getTableName(); 
+    const connection = await connect();  
+
+    try {
+      const [client] = await connection.query(`SELECT * FROM ${table} WHERE idClient=${id};`);
+      if(client.length < 1){
+        return res.status(404).send();
+      }
+      await connection.execute(
+        `UPDATE ${table} SET name='${name}', lastName='${lastName}' WHERE idClient=${id};`
+      );
+
+      const [newInfos] = await connection.query(`SELECT * FROM ${table} WHERE idClient=${id};`);
+
+      return res.status(200).send(newInfos);
+    } catch (error) {
+      return res.status(400).send(error);      
+    }
+  }
+  
 }
 
 module.exports = ClientController;

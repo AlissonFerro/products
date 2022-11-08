@@ -104,4 +104,67 @@ describe('/api/clientes', async () => {
     });
 
   });
+
+  describe('PUT /:id', () => {  
+    beforeEach(async () => {
+      await connection.execute(
+        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1');"
+      );
+    });
+    
+    afterEach(async () => {
+      await connection.execute('delete from `client_test` where idClient = 1;');
+    });
+
+    it('should return 400 if id is not valid', async () => {
+      const invalidsId = ['a', '!'];
+      invalidsId.map( async (invalidId) => {
+        const res = await request(server)
+          .put(`/api/clientes/${invalidId}`)
+          .send({ name: 'alterName', lastName: 'Alter Last Name'});
+        expect(res.status).toBe(400);
+      });
+    });
+
+    it('should return 400 if name or lastName was not passed', async () => {
+      const res = await request(server)
+        .put(`/api/clientes/1`)
+        .send({name: '', lastName: ''})
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 404 if id was not founded', async () => {   
+      const res = await request(server)
+        .put(`/api/clientes/5`)
+        .send({ name: 'alterName', lastName: 'Alter Last Name'});      
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 400 if name less than 3 caracters', async () => {
+      const res = await request(server)
+        .put('/api/clientes/1')
+        .send({ name: 'a', lastName: 'last Name'});
+
+      expect(res.status).toBe(400)
+    });
+
+    it('should return 400 if lastName less than 3 caracters', async () => {
+      const res = await request(server)
+        .put('/api/clientes/1')
+        .send({ name: 'name', lastName: 'a'});
+      
+      expect(res.status).toBe(400);
+    })
+      
+    it('should save new infos if name, lastName and id is valid', async () => {
+      const res = await request(server)
+        .put(`/api/clientes/1`)
+        .send({ name: 'alterName', lastName: 'Alter Last Name'});     
+      
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(1);
+      expect(res.body[0]).toHaveProperty('name', 'alterName');
+      expect(res.body[0]).toHaveProperty('lastName', 'Alter Last Name');        
+    });
+  })
 })
