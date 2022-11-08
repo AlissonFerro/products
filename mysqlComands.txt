@@ -7,6 +7,15 @@ create table client(
   lastName varchar(30) NOT NULL
 );
 
+ALTER TABLE client 
+ADD COLUMN createdAt DateTime AFTER lastName;
+
+ALTER TABLE client 
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE client 
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
+
 INSERT INTO client(idClient, name, lastName)
 VALUES (1, `teste`. `teste1`)
 
@@ -14,6 +23,15 @@ create table product(
   idProduct int NOT NULL PRIMARY KEY AUTO_INCREMENT,
   description varchar(45) NOT NULL
 );
+
+ALTER TABLE product 
+ADD COLUMN createdAt DateTime AFTER description;
+
+ALTER TABLE product 
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE product 
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
 create table request(
   idRequest int NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -24,6 +42,15 @@ create table request(
 ALTER TABLE request
 ADD CONSTRAINT idClient 
 FOREIGN KEY (idClient) REFERENCES client(idClient);
+
+ALTER TABLE request 
+ADD COLUMN createdAt DateTime AFTER idClient;
+
+ALTER TABLE request 
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE request 
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
 CREATE TABLE request_item(
   idRequest int,
@@ -39,6 +66,15 @@ ALTER TABLE request_item
 ADD CONSTRAINT idProduct
 FOREIGN KEY (idProduct) REFERENCES product(idProduct);
 
+ALTER TABLE request_item 
+ADD COLUMN createdAt DateTime AFTER amount;
+
+ALTER TABLE request_item
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE request_item
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
+
 ********************************************************************************************************
 
 create table client_test(
@@ -47,13 +83,28 @@ create table client_test(
   lastName varchar(30) NOT NULL
 );
 
-INSERT INTO client_test(idClient, name, lastName)
-VALUES (1, `teste`. `teste1`);
+ALTER TABLE client_test 
+ADD COLUMN createdAt DateTime AFTER lastName;
+
+ALTER TABLE client_test
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE client_test
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
 create table product_test(
   idProduct int NOT NULL PRIMARY KEY,
   description varchar(45) NOT NULL
 );
+
+ALTER TABLE product_test
+ADD COLUMN createdAt DateTime AFTER description;
+
+ALTER TABLE product_test
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE product_test
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
 create table request_test(
   idRequest int NOT NULL PRIMARY KEY,
@@ -62,11 +113,13 @@ create table request_test(
 );
 
 ALTER TABLE request_test
-ADD FOREIGN KEY (idClient) REFERENCES client_test(idClient);
+ADD COLUMN createdAt DateTime AFTER idClient;
 
 ALTER TABLE request_test
-ADD CONSTRAINT idClient 
-FOREIGN KEY (idClient) REFERENCES client_test(idClient);
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE request_test
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
 CREATE TABLE request_item_test(
   idRequest int,
@@ -75,7 +128,10 @@ CREATE TABLE request_item_test(
 );
 
 ALTER TABLE request_item_test
-ADD FOREIGN KEY (idRequest) REFERENCES request_test(idRequest);
+ADD COLUMN createdAt DateTime AFTER amount;
 
 ALTER TABLE request_item_test
-ADD FOREIGN KEY (idProduct) REFERENCES product_test(idProduct);
+ADD COLUMN modifiedAt DateTime AFTER createdAt;
+
+ALTER TABLE request_item_test
+ADD COLUMN removedAt DateTime AFTER modifiedAt;
