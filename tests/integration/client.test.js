@@ -3,6 +3,14 @@ const connect = require('../../db');
 let server;
 let connection;
 
+async function clearDB(){
+  await connection.execute('delete from `client_test` where idClient = 0;');
+  await connection.execute('delete from `client_test` where idClient = 1;');
+  await connection.execute('delete from `client_test` where idClient = 2;');
+  await connection.execute('delete from `client_test` where idClient = 3;');
+  await connection.execute('delete from `client_test` where idClient = 4;');
+}
+
 describe('/api/clientes', async() => {
   beforeEach(async () => { 
     server = require('../../index');
@@ -15,12 +23,7 @@ describe('/api/clientes', async() => {
   });
 
   describe('GET /', () => {
-    afterEach(async () => {
-      await connection.execute('delete from `client_test` where idClient = 1;');
-      await connection.execute('delete from `client_test` where idClient = 2;');
-      await connection.execute('delete from `client_test` where idClient = 3;');
-      await connection.execute('delete from `client_test` where idClient = 4;');
-    });
+    afterEach(async () => clearDB() );
 
     it('should return all clients if was not removed', async () => {
       await connection.execute(
@@ -61,12 +64,7 @@ describe('/api/clientes', async() => {
   });
 
   describe('GET /:id', () => {
-    afterEach(async () => {
-      await connection.execute('delete from `client_test` where idClient = 1;');
-      await connection.execute('delete from `client_test` where idClient = 2;');
-      await connection.execute('delete from `client_test` where idClient = 3;');
-      await connection.execute('delete from `client_test` where idClient = 4;');
-    });
+    afterEach(async () => clearDB() );
 
     it('should return a client if valid id was passed', async () => {
       await connection.execute(
@@ -128,9 +126,7 @@ describe('/api/clientes', async() => {
       name = 'name';
       lastName = 'lastName'
     });
-    afterEach(async () => {
-      await connection.execute('delete from `client_test` where idClient = 0;');
-    })
+    afterEach(async () => clearDB() )
 
     it('should return 400 if client name is less than 3 caracters', async () => {
       name = 'a';
@@ -167,9 +163,7 @@ describe('/api/clientes', async() => {
       );
     });
     
-    afterEach(async () => {
-      await connection.execute('delete from `client_test` where idClient = 1;');
-    });
+    afterEach(async () => clearDB());
 
     it('should return 400 if id is not valid', async () => {
       const invalidsId = ['a', '!'];
@@ -233,9 +227,7 @@ describe('/api/clientes', async() => {
       );
     });
     
-    afterEach(async () => {
-      await connection.execute('delete from `client_test` where idClient = 1;');
-    });
+    afterEach(async () => clearDB() );
     
     it('should return 400 if id is not valid', async () => {
       const invalidsId = ['a', '!', '1a', NaN];
@@ -256,5 +248,6 @@ describe('/api/clientes', async() => {
       expect(res.body[0]).toHaveProperty('createdAt');
       expect(res.body[0].removedAt).not.toBeNull();
     });
-  })
+  });
+  
 })
