@@ -1,10 +1,9 @@
-const connect = require('../db');
+const connection = require('../db');
 const getTableName = require('../utils/env');
 
 class ProductController{
   static async getAllProducts(req, res){
     const table = getTableName('product');
-    const connection = await connect();
     const [rows] = await connection.query(
       `SELECT \`idProduct\`, \`description\` FROM ${table} WHERE \`removedAt\` IS NULL;`
       );
@@ -16,7 +15,6 @@ class ProductController{
     const { id } = req.params;
     
     try {
-      const connection = await connect();
       const [product] = await connection.query(
         `SELECT \`idProduct\`, \`description\` FROM ${table} WHERE idProduct = ${id} AND \`removedAt\` IS NULL;`
       );
@@ -37,7 +35,6 @@ class ProductController{
     if(!description || description.length < 3) 
       return res.status(400).send();
 
-    const connection = await connect();
     const table = getTableName('product');
     const now = new Date();
     const [products] = await connection.query(
@@ -64,7 +61,6 @@ class ProductController{
       return res.status(400).send();
 
     const table = getTableName('product');
-    const connection = await connect();
     const [product] = await connection.query(
       `SELECT * FROM ${table} WHERE idProduct=${id};`
     )
@@ -88,7 +84,6 @@ class ProductController{
   static async removeProduct(req, res){
     const { id } = req.params;
     const table = getTableName('product');
-    const connection = await connect();
     try {
       const [product] = await connection.query(
         `SELECT * FROM ${table} WHERE idProduct=${id}`

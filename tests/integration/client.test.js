@@ -1,7 +1,6 @@
 const request = require('supertest');
-const connect = require('../../db');
+const connection = require('../../db');
 let server;
-let connection;
 
 async function clearDB(){
   await connection.execute('delete from `client_test` where idClient = 0;');
@@ -14,11 +13,9 @@ async function clearDB(){
 describe('/api/clientes', async() => {
   beforeEach(async () => { 
     server = require('../../index');
-    connection = await connect();
   });
   
-  afterEach(async() => { 
-    connection.end();
+  afterEach(async() => {
     server.close();
   });
 
@@ -249,5 +246,5 @@ describe('/api/clientes', async() => {
       expect(res.body[0].removedAt).not.toBeNull();
     });
   });
-  
+
 })

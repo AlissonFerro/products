@@ -1,10 +1,9 @@
-const connect = require('../db');
+const connection = require('../db');
 const getTableName = require('../utils/env');
 
 class ClientController {
   static async getAllClients(req, res){    
     const table = getTableName('client'); 
-    const connection = await connect();
     const [rows] = await connection.query(`SELECT \`idClient\`, \`name\`, \`lastName\` FROM ${table} WHERE \`removedAt\` IS NULL;`);
     return res.send(rows);
   };
@@ -14,7 +13,6 @@ class ClientController {
     const { id } = req.params;
 
     try {
-      const connection = await connect();
       const [rows] = await connection.query(`SELECT \`idClient\`, \`name\`, \`lastName\` FROM ${table} where idClient=${id} AND \`removedAt\` IS NULL;`);
 
       if(rows.length <1){
@@ -34,8 +32,7 @@ class ClientController {
       name.length < 3 || lastName.length < 3
       )
       return res.status(400).send();
-    
-    const connection = await connect();    
+       
     const table = getTableName('client');
 
     const [rows] = await connection.query(`SELECT * FROM ${table};`);
@@ -60,7 +57,6 @@ class ClientController {
       return res.status(400).send();
 
     const table = getTableName('client'); 
-    const connection = await connect();  
 
     try {
       const [client] = await connection.query(`SELECT * FROM ${table} WHERE idClient=${id};`);
@@ -87,7 +83,6 @@ class ClientController {
     const { id } = req.params;
 
     try {
-      const connection = await connect();
       const [client] = await connection.query(`SELECT * FROM ${table} where idClient=${id};`);
 
       if(client.length < 1){

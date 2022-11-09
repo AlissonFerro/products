@@ -1,7 +1,6 @@
 const request = require('supertest');
-const connect = require('../../db');
+const connection = require('../../db');
 let server;
-let connection;
 
 async function clearDB(){
   await connection.execute('DELETE FROM `product_test` WHERE idProduct = 0;');
@@ -14,11 +13,9 @@ async function clearDB(){
 describe('/api/produtos', async () => {
   beforeEach(async () => {
     server = require('../../index');
-    connection = await connect();
   });
 
   afterEach(async () => {
-    connection.end();
     server.close();
   });
 
