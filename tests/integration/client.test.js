@@ -3,7 +3,7 @@ const connect = require('../../db');
 let server;
 let connection;
 
-describe('/api/clientes', () => {
+describe('/api/clientes', async() => {
   beforeEach(async () => { 
     server = require('../../index');
     connection = await connect();
@@ -86,7 +86,7 @@ describe('/api/clientes', () => {
       expect(res.body[0]).not.toHaveProperty('removedAt');
     });
       
-    it('should return 404 if id was not valid', async () => {
+    it('should return 400 if id was not valid', async () => {
       await connection.execute(
         "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
         "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00')," + 
@@ -110,6 +110,15 @@ describe('/api/clientes', () => {
       const res = await request(server).get("/api/clientes/4");
       expect(res.status).toBe(404);      
     });
+
+    it('should return not found item if client was deleted', async () => {
+      await connection.execute(
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt, removedAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00', '2022-11-09 00:00:00');"
+      );
+      const res = await request(server).get("/api/clientes/1");
+      expect(res.status).toBe(404);
+    })
   });
 
   describe('POST /', () => {
@@ -179,7 +188,7 @@ describe('/api/clientes', () => {
       expect(res.status).toBe(400);
     });
 
-    it('should return 404 if id was not founded', async () => {   
+    it('should return 404 if id was not found', async () => {   
       const res = await request(server)
         .put(`/api/clientes/5`)
         .send({ name: 'alterName', lastName: 'Alter Last Name'});      
@@ -245,7 +254,7 @@ describe('/api/clientes', () => {
       const res = await request(server).delete('/api/clientes/1').send();
       expect(res.status).toBe(200);
       expect(res.body[0]).toHaveProperty('createdAt');
-      expect(res.body[0]).toHaveProperty('removedAt');
+      expect(res.body[0].removedAt).not.toBeNull();
     });
   })
 })
