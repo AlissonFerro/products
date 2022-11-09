@@ -1,7 +1,6 @@
 const env = require('../env');
 
-function getTableName(){
-  let table = 'client';
+function getTableName(table){
   if(env == 'TEST')
     table += '_test';
 
