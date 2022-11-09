@@ -1,12 +1,12 @@
 const express = require('express');
-const ClientController = require('../controller/Client');
+const Client = require('../controller/Client');
 const router = express.Router();
 
 router
-  .get("/api/clientes", ClientController.getAllClients)
-  .get("/api/clientes/:id", ClientController.getClientById)
-  .post("/api/clientes", ClientController.createClient)
-  .put("/api/clientes/:id", ClientController.alterClientById)
-  .delete('/api/clientes/:id', ClientController.removeClient)
+  .get("/api/clientes", Client.getAllClients)
+  .get("/api/clientes/:id", Client.getClientById)
+  .post("/api/clientes", Client.createClient)
+  .put("/api/clientes/:id", Client.alterClientById)
+  .delete('/api/clientes/:id', Client.removeClient)
 
 module.exports = router;

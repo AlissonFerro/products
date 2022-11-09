@@ -3,31 +3,61 @@ const connect = require('../../db');
 let server;
 let connection;
 
-describe('/api/clientes', async () => {
+describe('/api/clientes', () => {
   beforeEach(async () => { 
     server = require('../../index');
     connection = await connect();
   });
   
-  afterEach(async() => {   
-    await connection.execute('delete from `client_test` where idClient = 1;');
-    await connection.execute('delete from `client_test` where idClient = 2;');
-    await connection.execute('delete from `client_test` where idClient = 3;');
-    await connection.execute('delete from `client_test` where idClient = 4;');
-
+  afterEach(async() => { 
     connection.end();
     server.close();
   });
 
   describe('GET /', () => {
-    it('should return all clients', async () => {
+    afterEach(async () => {
+      await connection.execute('delete from `client_test` where idClient = 1;');
+      await connection.execute('delete from `client_test` where idClient = 2;');
+      await connection.execute('delete from `client_test` where idClient = 3;');
+      await connection.execute('delete from `client_test` where idClient = 4;');
+    });
+
+    it('should return all clients if was not removed', async () => {
       await connection.execute(
-        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1'), (2, 'name2', 'lastName2'), (3, 'name3', 'lastName3');"
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00')," + 
+        "(2, 'name2', 'lastName2', '2022-11-09 00:00:00')," + 
+        "(3, 'name3', 'lastName3', '2022-11-09 00:00:00');"
       );
       const res = await request(server).get("/api/clientes");
       expect(res.status).toBe(200);
-      expect(res.body.length).toBe(3);    
-    }); 
+      expect(res.body.length).toBe(3);
+      expect(res.body[0]).toHaveProperty('name');
+      expect(res.body[0]).toHaveProperty('lastName');
+      expect(res.body[0]).not.toHaveProperty('createdAt');    
+      expect(res.body[0]).not.toHaveProperty('modifiedAt');    
+      expect(res.body[0]).not.toHaveProperty('removedAt');    
+    });
+
+    it('should return all clients if was more 1 removed', async () => {
+      await connection.execute(
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00')," + 
+        "(3, 'name3', 'lastName3', '2022-11-09 00:00:00');"
+      );
+      await connection.execute(
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt, removedAt)" +
+        "VALUES (2, 'name2', 'lastName2', '2022-11-09 00:00:00', '2022-11-09 00:00:00');"
+      );
+      const res = await request(server).get("/api/clientes");
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(2);
+      expect(res.body[0]).toHaveProperty('name');
+      expect(res.body[0]).toHaveProperty('lastName');
+      expect(res.body[0]).not.toHaveProperty('createdAt');    
+      expect(res.body[0]).not.toHaveProperty('modifiedAt');    
+      expect(res.body[0]).not.toHaveProperty('removedAt');
+    })
   });
 
   describe('GET /:id', () => {
@@ -40,7 +70,10 @@ describe('/api/clientes', async () => {
 
     it('should return a client if valid id was passed', async () => {
       await connection.execute(
-        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1'), (2, 'name2', 'lastName2'), (3, 'name3', 'lastName3');"
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00')," + 
+        "(2, 'name2', 'lastName2', '2022-11-09 00:00:00')," + 
+        "(3, 'name3', 'lastName3', '2022-11-09 00:00:00');"
       );
       
       const res = await request(server).get("/api/clientes/2");   
@@ -48,11 +81,17 @@ describe('/api/clientes', async () => {
       expect(res.body.length).toBe(1);
       expect(res.body[0]).toHaveProperty('name', 'name2');
       expect(res.body[0]).toHaveProperty('lastName', 'lastName2');
+      expect(res.body[0]).not.toHaveProperty('createdAt');    
+      expect(res.body[0]).not.toHaveProperty('modifiedAt');    
+      expect(res.body[0]).not.toHaveProperty('removedAt');
     });
       
     it('should return 404 if id was not valid', async () => {
       await connection.execute(
-        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1'), (2, 'name2', 'lastName2'), (3, 'name3', 'lastName3');"
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00')," + 
+        "(2, 'name2', 'lastName2', '2022-11-09 00:00:00')," + 
+        "(3, 'name3', 'lastName3', '2022-11-09 00:00:00');"
       );
       const invalidsId = ['a', '!'];
       invalidsId.map( async (invalidId) => {
@@ -63,7 +102,10 @@ describe('/api/clientes', async () => {
     
     it('should return 404 if id not found', async () => {
       await connection.execute(
-        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1'), (2, 'name2', 'lastName2'), (3, 'name3', 'lastName3');"
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00')," + 
+        "(2, 'name2', 'lastName2', '2022-11-09 00:00:00')," + 
+        "(3, 'name3', 'lastName3', '2022-11-09 00:00:00');"
       );
       const res = await request(server).get("/api/clientes/4");
       expect(res.status).toBe(404);      
@@ -101,6 +143,9 @@ describe('/api/clientes', async () => {
       expect([res.body].length).toBe(1);
       expect(res.body[0]).toHaveProperty('name', 'name');
       expect(res.body[0]).toHaveProperty('lastName', 'lastName');
+      expect(res.body[0]).not.toHaveProperty('createdAt');    
+      expect(res.body[0]).not.toHaveProperty('modifiedAt');    
+      expect(res.body[0]).not.toHaveProperty('removedAt');
     });
 
   });
@@ -108,7 +153,8 @@ describe('/api/clientes', async () => {
   describe('PUT /:id', () => {  
     beforeEach(async () => {
       await connection.execute(
-        "INSERT INTO `client_test`(idClient, name, lastName) VALUES (1, 'name1', 'lastName1');"
+        "INSERT INTO `client_test`(idClient, name, lastName, createdAt)" +
+        "VALUES (1, 'name1', 'lastName1', '2022-11-09 00:00:00');"
       );
     });
     
@@ -164,7 +210,10 @@ describe('/api/clientes', async () => {
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(1);
       expect(res.body[0]).toHaveProperty('name', 'alterName');
-      expect(res.body[0]).toHaveProperty('lastName', 'Alter Last Name');        
+      expect(res.body[0]).toHaveProperty('lastName', 'Alter Last Name'); 
+      expect(res.body[0]).not.toHaveProperty('createdAt');    
+      expect(res.body[0]).not.toHaveProperty('modifiedAt');    
+      expect(res.body[0]).not.toHaveProperty('removedAt');  
     });
   });
 
@@ -195,7 +244,8 @@ describe('/api/clientes', async () => {
     it('should delete item if id is valid', async () => {
       const res = await request(server).delete('/api/clientes/1').send();
       expect(res.status).toBe(200);
-      expect(res.body).toHaveProperty('sucess', 'sucess');
+      expect(res.body[0]).toHaveProperty('createdAt');
+      expect(res.body[0]).toHaveProperty('removedAt');
     });
   })
 })
