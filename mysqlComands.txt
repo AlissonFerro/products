@@ -52,21 +52,23 @@ ADD COLUMN modifiedAt DateTime AFTER createdAt;
 ALTER TABLE request 
 ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
-CREATE TABLE request_item(
+CREATE TABLE request_item_test(
+  idRequestItem int NOT NULL PRIMARY KEY,
   idRequest int,
   idProduct int,
-  amount int
+  amount int, 
+  createdAt DateTime,
+  modifiedAt DateTime,
+  removedAt DateTime
 );
 
-ALTER TABLE request_item
-ADD CONSTRAINT idRequest
-FOREIGN KEY (idRequest) REFERENCES request(idRequest);
+ALTER TABLE request_item_test
+ADD FOREIGN KEY (idRequest) REFERENCES request_test(idRequest);
+
+ALTER TABLE request_item_test
+ADD FOREIGN KEY (idProduct) REFERENCES product_test(idProduct);
 
 ALTER TABLE request_item
-ADD CONSTRAINT idProduct
-FOREIGN KEY (idProduct) REFERENCES product(idProduct);
-
-ALTER TABLE request_item 
 ADD COLUMN createdAt DateTime AFTER amount;
 
 ALTER TABLE request_item
@@ -121,10 +123,14 @@ ADD COLUMN modifiedAt DateTime AFTER createdAt;
 ALTER TABLE request_test
 ADD COLUMN removedAt DateTime AFTER modifiedAt;
 
-CREATE TABLE request_item_test(
+CREATE TEMPORARY TABLE request_item_test(
+  idRequestItem int NOT NULL PRIMARY KEY,
   idRequest int,
   idProduct int,
-  amount int
+  amount int,
+  createdAt DateTime,
+  modifiedAt DateTime,
+  removedAt DateTime
 );
 
 ALTER TABLE request_item_test
