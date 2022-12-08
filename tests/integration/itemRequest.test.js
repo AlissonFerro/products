@@ -88,5 +88,85 @@ describe('/api/itensPedidos', async () => {
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2)
     })
+  });
+
+  describe('GET /:id',async () => {
+    beforeEach(async() => await insertFKInDB());
+    afterEach(async() => await clearDB());
+
+    it('should return a item if valid id was passed', async () => {
+      await connection.execute(
+        "INSERT INTO \`request_item_test\` (idRequestItem, idRequest, idProduct, amount, createdAt) VALUES " + 
+        "(1, 11, 11, 20, '2022-11-09 00:00:00');"
+      );
+
+      const res = await request(server).get('/api/itensPedidos/1');
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBe(1);
+      expect(res.body[0]).not.toHaveProperty('createdAt');
+      expect(res.body[0]).not.toHaveProperty('modifiedAt');
+      expect(res.body[0]).not.toHaveProperty('removedAt');
+    });
+
+    it('should return 400 if id was not valid', async () => {
+      await connection.execute(
+        "INSERT INTO \`request_item_test\` (idRequestItem, idRequest, idProduct, amount, createdAt) VALUES " + 
+        "(1, 11, 11, 20, '2022-11-09 00:00:00');"
+      );
+      
+      const invalidsId = ['a', '!', '1a', '-'];
+
+      invalidsId.map( async (invalidId) => {
+        const res = await(request(server).get(`/api/itensPedidos/${invalidId}`));
+        expect(res.status).toBe(400)
+      })
+    });
+
+    it('should return 404 if id was not found', async () => {
+      await connection.execute(
+        "INSERT INTO \`request_item_test\` (idRequestItem, idRequest, idProduct, amount, createdAt) VALUES " + 
+        "(1, 11, 11, 20, '2022-11-09 00:00:00');"
+      );
+
+      const res = await request(server).get('/api/itensPedidos/0');
+      expect(res.status).toBe(404);
+    })
+
+    it('should return 404 if id was deleted', async () => {
+      await connection.execute(
+        "INSERT INTO \`request_item_test\` (idRequestItem, idRequest, idProduct, amount, createdAt, removedAt) VALUES " + 
+        "(1, 11, 11, 20, '2022-11-09 00:00:00','2022-11-10 00:00:00');"
+      );
+
+      const res = await(request(server).get('/api/itensPedidos/1'));
+      expect(res.status).toBe(404);
+    })
+  });
+
+  describe('POST /', async () => {
+    let amount;
+    let idRequest;
+    let idProduct;
+    beforeEach(async () => {
+      await insertFKInDB()
+      amount = 1;
+      idRequest = 11;
+      idProduct = 11;
+    })
+    afterEach(async() => await clearDB());
+
+    it('should return 400 if amount is not a number', async () => {
+      amount = 'a';
+      const res = await request(server).post('/api/itensPedidos')
+        .send({ idRequest, idProduct, amount });
+      expect(res.status).toBe(400);
+    });
+
+    it('sould save the product if it is valid', async() => {
+      const res = await request(server).post('/api/itensPedidos')
+        .send({ idRequest, idProduct, amount });
+      
+      expect(res.status).toBe(200)
+    })
   })
 });

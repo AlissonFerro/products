@@ -5,7 +5,8 @@ class ProductController{
   static async getAllProducts(req, res){
     const table = getTableName('product');
     const [rows] = await connection.query(
-      `SELECT \`idProduct\`, \`description\` FROM ${table} WHERE \`removedAt\` IS NULL;`
+      `SELECT \`idProduct\`, \`description\` FROM ${table} 
+      WHERE \`removedAt\` IS NULL;`
       );
     return res.send(rows);
   }
@@ -16,7 +17,8 @@ class ProductController{
     
     try {
       const [product] = await connection.query(
-        `SELECT \`idProduct\`, \`description\` FROM ${table} WHERE idProduct = ${id} AND \`removedAt\` IS NULL;`
+        `SELECT \`idProduct\`, \`description\` FROM ${table} 
+        WHERE idProduct = ${id} AND \`removedAt\` IS NULL;`
       );
       
       if(product.length < 1){
